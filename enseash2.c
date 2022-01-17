@@ -16,7 +16,7 @@ int main(){
 		write(STDOUT_FILENO, prompt, sizeof(prompt));
 		cmdlength=read(STDIN_FILENO, cmd , SIZE_BUF);
 		cmd[cmdlength-1] = '\0';
-		execlp(cmd, cmd,(char *)NULL);
+		execlp(cmd, cmd,(char *)NULL); //on execute une commande écrite dans le terminale
 	}
 	exit(EXIT_SUCCESS);
 }

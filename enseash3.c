@@ -24,10 +24,10 @@ int main(){
 			break;
 		}
 		pid_t pid = fork();
-		if(pid==0){
+		if(pid==0){ //processus fils
 			execlp(cmd, cmd,(char *)NULL);
 		}
-		else{
+		else{ //processus père
 			wait(NULL);
 		}
 		write(STDOUT_FILENO, prompt, sizeof(prompt));
