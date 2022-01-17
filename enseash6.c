@@ -13,6 +13,7 @@ const char bienvenue[] = "Bienvenue dans le Shell ENSEA.\nPour quitter,tapez 'ex
 const char prompt[] = "enseash %";
 const char Exit[] = "exit";
 const char byebye[] = "Bye Bye...\n";
+const char *separators = " ";
 int result;
 int tempsmilli;
 struct timespec tp;
@@ -23,18 +24,23 @@ int main(){
 	char signal[SIZE_BUF] = "enseash4[sign:";
 	int status;
 	char signfils[SIZE_BUF];
+	int i = 0;
 	
 	write(STDOUT_FILENO, bienvenue, sizeof(bienvenue));
 	write(STDOUT_FILENO, prompt, sizeof(prompt));
 	
 	while(1){
 		
+		char *strToken;
+		char *cmddup;
 		char tempsDebut[SIZE_BUF] = "enseash[exit:0||"; 
 		char temps[SIZE_BUF];
 		char tempsFin[] = " ms] %";
 		
-		cmdlength=read(STDIN_FILENO, cmd , SIZE_BUF);
+		cmdlength=read(STDIN_FILENO, cmd, SIZE_BUF);
 		cmd[cmdlength-1] = '\0';
+	
+		
 		if (strncmp(cmd,Exit, sizeof(Exit))==0 || cmdlength == 0){
 			write(STDOUT_FILENO, byebye, sizeof(byebye));
 			break;
@@ -43,18 +49,33 @@ int main(){
 		pid_t pid = fork();
 			
 		if(pid==0){
+			
 			result = clock_gettime(CLOCK_REALTIME, &tp);
 			if(result != 0){
 				exit(EXIT_FAILURE);
 			}
 			else{
-				int a1 = tp.tv_sec;    //on prend les valeurs de tmps au debut de l'execution de commande
+				int a1 = tp.tv_sec;
 				int a2 = tp.tv_nsec;
-				execlp(cmd, cmd,(char *)NULL);
+				char *list[20]; //creation d'une liste de caractère 
+				cmddup = strdup(cmd); //duplique la commande afin de pouvoir utilisr strtok qui modifie celle-ci sans toucher à la commande principale
+				
+				for (int j = 0; ; j++, cmddup = NULL) {
+					strToken = strtok(cmddup, " "); //enregistre le premier mot de la commande
+					if (strToken == NULL)
+					break;
+				list[j] = strToken; //on ajoute les mots de la commande à chaque indice de la liste
+				i+=1;
+				}	
+				free(cmddup); //permet de libérrer l'allocation de mémoire
+				list[i] = (char *)NULL; //le dernier mot de la liste correspond au dernier arguments de la fonction execvp
+				
+				execvp(list[0],&list[0]); //permet d'executer la commande des differents mots à la suite
+				
 				result = clock_gettime(CLOCK_REALTIME,&tp);
-				int b1 = tp.tv_sec;  //on prend les valeurs de tmps a la fin de l'execution de commande
+				int b1 = tp.tv_sec;
 				int b2 = tp.tv_nsec;
-				tempsmilli = ( b1 - a1 )*MILLE + ( b2 - a2 )/MILLION; //on calcule la difference
+				tempsmilli = ( b1 - a1 )*MILLE + ( b2 - a2 )/MILLION;
 				write(STDOUT_FILENO, prompt, sizeof(prompt));
 				exit(EXIT_FAILURE);
 			}

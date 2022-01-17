@@ -15,7 +15,6 @@ int main(){
 	int cmdlength;
 	char sortie[SIZE_BUF] = "enseash4[exit:0]%";
 	char signal[SIZE_BUF] = "enseash4[sign:9]%";
-	int retour;
 	int status;
 	char signfils[SIZE_BUF];
 	write(STDOUT_FILENO, bienvenue, sizeof(bienvenue));
@@ -34,9 +33,9 @@ int main(){
 		}
 		else{
 			wait(&status);
-			if(WIFEXCITED(status)){
+			if(WIFEXITED(status)){  //aucun signal n'a géné l'éxecution de la commande
 				write(STDOUT_FILENO,sortie,strlen(sortie));}
-			else if(WIFSIGNALED(status)){
+			else if(WIFSIGNALED(status)){  //on regarde si un signal à empecher l'execution de la commande et à quel type de signal ça correspond
 				signfils[0] = (char)WTERMSIG(status);
 				write(STDOUT_FILENO,strcat(signal, &signfils[0]),strlen(signal));
 			}		
